@@ -31,8 +31,8 @@ module.exports = {
     proxyTable: {
         '/apis': {
             // 测试环境
-            target: 'http://localhost:8090', // 本地接口域名
-            // target: 'http://ceshi.joblian.cn', // 线上接口域名
+            // target: 'http://localhost:8090', // 本地接口域名
+            target: 'http://ceshi.joblian.cn', // 线上接口域名
             changeOrigin: true, //是否跨域
             pathRewrite: {
                 '^/apis': '' //需要rewrite重写的,

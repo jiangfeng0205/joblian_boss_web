@@ -23,8 +23,8 @@ import io from 'socket.io-client';
 
 Vue.use(new VueSocketio({
     debug: true,
-    connection: 'http://localhost:8090/', // 本地环境
-    // connection: 'http://ceshi.joblian.cn:8090/',    // 线上环境
+    // connection: 'http://localhost:8090/', // 本地环境
+    connection: 'http://ceshi.joblian.cn:8090/',    // 线上环境
     vuex: {
         actionPrefix: 'SOCKET_',
         mutationPrefix: 'SOCKET_'

@@ -6,7 +6,10 @@
 	    	<!-- <div class="right" @click="companyAndJobChange()"><span class="icon-earth"></span></div> -->
         <div class="inforight job_header_icon" style="margin-right:0.5rem;">
             <b></b>
-            <span><i class="iconfont icon-jiahao"></i> </span>
+            <!-- <span><i class="iconfont icon-jiahao"></i> </span> -->
+            <router-link  tag="span" class="iconfont"  :to="{path : '/company/companyjobadd'}">
+                <i class="iconfont icon-jiahao"></i>
+            </router-link>
             <span class="iconfont" @click="companyAndJobChange()"> <span class="icon-earth"></span></span>
             <!-- <span><i class="iconfont icon-sousuo"></i></span> -->
         </div>

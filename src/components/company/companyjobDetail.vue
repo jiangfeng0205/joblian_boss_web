@@ -143,9 +143,11 @@
           <!---->
           <div class="top_detial_bg">
             <div class="top_detial">
+
               <h3>{{companyJobSaveData.jobname}}
                   <span v-if="companyJobSaveData.payNum && companyJobSaveData.pulishMode.value==2">【{{companyJobSaveData.payNum}}】</span>
                   <span v-else>【{{companyJobSaveData.salary.name}}】</span>
+                  <span class="wxshare" @click="sendWxshare()">分享</span>
               </h3>
               <p>
                 <span><i class="icon-position"></i><span v-for="provice in companyJobSaveData.cityClassTitle">{{provice.name}} </span></span>
@@ -227,14 +229,36 @@
       </div>
     </div>
 
+    <div class="zhezhao" v-show="isZhezhao">
+        <!-- 微信内分享 -->
+        <div class="share_help" v-if="shareType == 'wx'">
+            <img alt="Scan me!" style="margin-top:-0.4rem;"  src="/static/images/wxshare_help.png">
+        </div>
+        <div class="share_help" v-if="shareType == 'wx'">
+            <img alt="Scan me!" style="margin-top:0.5rem;margin-right:1.5rem"  src="/static/images/share_known.png" @click="closeZhezhao()">
+        </div>
+    </div>
+
+    <!-- 浏览器分享 -->
+    <div class="zhezhao_modal" v-show="isZhezhao">
+        <div class="share_title" v-if="shareType == 'browser'">请扫描二维码分享</div>
+        <div id="qrcode" v-if="shareType == 'browser'"></div>
+        <div class="mint-msgbox-btns" v-if="shareType == 'browser'"><button class="mint-msgbox-btn mint-msgbox-confirm " @click="closeZhezhao()">确定</button></div>
+
+    </div>
   </div>
+
 </template>
 
-<script>
+
+<script >
+import WeixinApi from "../../js/WeixinApi";
 import Store from "../../js/userstore";
 import units from '../../js/units';
 import axios from "axios";
 import wx from 'weixin-js-sdk';
+import QRCode from 'qrcodejs2';
+import { Toast } from 'mint-ui';
 import { mapState,mapGetters,mapMutations } from 'vuex';
 
 export default {
@@ -333,6 +357,8 @@ export default {
       localCompanyJobSaveData:{},
       jotId : 0,
       companyJobDetail : {},
+      isZhezhao : false,
+      shareType : 'browser',
 
     }
   },
@@ -604,6 +630,7 @@ export default {
                 signature : wxConfig.data.signature,// 必填，签名
                 jsApiList : [ // 必填，需要使用的JS接口列表
                     'onMenuShareAppMessage',
+                    'onMenuShareTimeline'
                 ]
             });
 
@@ -639,6 +666,16 @@ export default {
                                 console.log('save share error');
                             });
                         }
+                    }
+                });
+
+                wx.onMenuShareTimeline({
+                    title: _self.companyJobSaveData.jobname, // 分享标题
+                    link: url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                    imgUrl: 'http://weixin.joblian.cn/heiwuchang.jpg', // 分享图标
+                    success: function () {
+                        // 设置成功
+                        console.log('onMenuShareTimeline');
                     }
                 });
             });
@@ -774,7 +811,43 @@ export default {
         // return false;
         return validata;
 
-    }
+    },
+
+    browserType(){
+        var ua = navigator.userAgent.toLowerCase();
+        var isWeixin = ua.indexOf('micromessenger') != -1;
+        if (isWeixin) {
+            this.shareType = 'wx';
+        } else {
+            this.shareType = 'browser';
+        }
+    },
+
+    qrcode() {
+        document.getElementById('qrcode').innerHTML = '';
+
+        let qrcode = new QRCode('qrcode', {
+            width: 132,
+            height: 132,
+            text: location.href, // 二维码地址
+            // text: 'http://weixin.joblian.cn/company/companyjobDetail/2', // 二维码地址
+            colorDark : "#000",
+            colorLight : "#fff",
+        });
+
+    },
+
+    sendWxshare(){
+        this.isZhezhao = true;
+
+        if (this.shareType == 'browser') {
+            this.qrcode();
+        }
+    },
+
+    closeZhezhao(){
+        this.isZhezhao = false;
+    },
 
   },
   // 創建后挂载到root之后调用该钩子函数
@@ -785,7 +858,7 @@ export default {
   // 该实例被创建还没挂载root之前，ajax可以在这里
   created(){
       console.log('location.href--',location.href);
-
+      this.browserType();
       Store.saveLoginJump('/company/companyJobDetail/' + this.$route.params.jobId);
       if (units.debugConfig()) {
           this.jobId = units.decrypt(this.$route.params.jobId);
@@ -908,4 +981,64 @@ padding-top: 0rem!important;
       // border-radius:60%;
     }
 }
+.wxshare{
+    float: right;
+    color: royalblue !important;
+}
+.zhezhao_modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate3d(-50%, -50%, 0);
+    transform: translate3d(-50%, -50%, 0);
+    background-color: #fff;
+    width: 85%;
+    border-radius: 3px;
+    font-size: 16px;
+    -webkit-user-select: none;
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: .2s;
+    transition: .2s;
+    display:table-cell;
+    text-align:center;
+    vertical-align:middle;
+    z-index:200;
+}
+
+.share_title{
+    text-align: center;
+    padding-bottom:0.5rem;
+    margin-top: 0.5rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+#qrcode {
+    display: inline-block;
+    img {
+      width: 132px;
+      height: 132px;
+      background-color: #fff; //设置白色背景色
+      padding: 6px; // 利用padding的特性，挤出白边
+    }
+}
+
+.share_help{
+    text-align:right;
+}
+
+.zhezhao{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background: #000;
+    z-index:100;
+}
+
 </style>

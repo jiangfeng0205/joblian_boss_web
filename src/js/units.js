@@ -62,13 +62,13 @@ let Common={
     },
 
     host:function () {
-        // return 'http://ceshi.joblian.cn'; //线上环境
-        return 'http://localhost:8090'; //本地
+        return 'http://ceshi.joblian.cn'; //线上环境
+        // return 'http://localhost:8090'; //本地
     },
 
     picHost:function(){//图片链接地址
-        // return 'http://ceshi.joblian.cn';
-        return 'http://localhost:8090'; //本地
+        return 'http://ceshi.joblian.cn';
+        // return 'http://localhost:8090'; //本地
     },
 
     domain:function(url, type=0){
