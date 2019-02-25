@@ -232,10 +232,10 @@
     <div class="zhezhao" v-show="isZhezhao">
         <!-- 微信内分享 -->
         <div class="share_help" v-if="shareType == 'wx'">
-            <img alt="Scan me!" style="margin-top:-0.4rem;"  src="/static/images/wxshare_help.png">
+            <img alt="Scan me!" style="margin-top:-0.4rem;width:62%;"  src="/static/images/wxshare_help.png">
         </div>
         <div class="share_help" v-if="shareType == 'wx'">
-            <img alt="Scan me!" style="margin-top:0.5rem;margin-right:1.5rem"  src="/static/images/share_known.png" @click="closeZhezhao()">
+            <img alt="Scan me!" style="margin-top:2%;margin-right:3%;width:50%"  src="/static/images/share_known.png" @click="closeZhezhao()">
         </div>
     </div>
 
