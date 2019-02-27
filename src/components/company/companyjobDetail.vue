@@ -355,7 +355,7 @@ export default {
       },
 
       localCompanyJobSaveData:{},
-      jotId : 0,
+      jobId : 0,
       companyJobDetail : {},
       isZhezhao : false,
       shareType : 'browser',
@@ -666,6 +666,8 @@ export default {
                                 console.log('save share error');
                             });
                         }
+
+                        _self.weixinRedirect(); // 微信静默授权
                     }
                 });
 
@@ -710,6 +712,58 @@ export default {
         .catch(function (error) {
             alert('网络连接失败');
         });
+    },
+
+    wxLoginOAuth(){
+        var _self = this;
+        var jobId = this.jobId
+        var weixinCode = this.$route.query.code;
+        var userId   = Store.get('user-id');
+        var userType = Store.get('userType');
+
+        if (userId && userType) {
+            var url = 'wxApi/getWxUserOpenId';
+        } else {
+            var url = 'wxApi/getWxBaseOpenId'
+        }
+
+        if (weixinCode) {
+            axios({
+                method: 'post',
+                url: units.domain(url),
+                data: {
+                    jobId : jobId,
+                    code  : weixinCode,
+                    state : this.$route.query.state
+                },
+            }).then(function (response) {
+                _self.$router.push({'path':'/company/companyjobDetail/'+jobId});
+            })
+            .catch(function (error) {
+                alert('网络连接失败');
+            });
+
+        }
+    },
+
+    weixinRedirect(){
+        // var redirect_uri = 'http://weixin.joblian.cn/company/companyjobDetail/' + jobId;
+        var redirect_uri = location.href;
+        var redirect_uri = encodeURIComponent(redirect_uri);
+        // var appid        = 'wxc3718b06f767373f'; //jfeng微信测试号
+        var appid        = 'wx4b200d5386bf7628'; // appid joblian微信公众平台查看
+        var jobId        = this.jobId;
+        var userId   = Store.get('user-id');
+        var userType = Store.get('userType');
+        var userName = Store.get('userName');
+
+        if (userId && userType) {
+            var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+appid+'&redirect_uri='+redirect_uri+'&response_type=code&scope=snsapi_userinfo&state='+jobId+'#wechat_redirect'; // 微信授权
+        } else {
+            var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+appid+'&redirect_uri='+redirect_uri+'&response_type=code&scope=snsapi_base&state='+jobId+'#wechat_redirect'; // 静默微信授权
+        }
+
+        window.location.href = url;
     },
 
     saveCompanyJob(){
@@ -871,6 +925,7 @@ export default {
       // this.getAccessToken();
       // this.getJsapiTicket();
       this.shareCompanyJob();
+      this.wxLoginOAuth();
   }
 }
 </script>
